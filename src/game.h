@@ -7,6 +7,7 @@
 
 #include <hagame/core/game.h>
 #include "constants.h"
+#include "tool.h"
 
 class Game : public hg::Game {
 public:
@@ -21,8 +22,6 @@ public:
         hg::Game(name)
     {}
 #endif
-
-
 
 protected:
 
@@ -39,6 +38,7 @@ private:
     hg::Vec2i m_size;
 #endif
 
+    std::vector<std::shared_ptr<Tool>> m_tools;
 };
 
 #endif //HGAMETEMPLATE_GAME_H

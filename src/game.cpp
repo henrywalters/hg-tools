@@ -4,6 +4,10 @@
 #include "game.h"
 
 #include <hagame/graphics/windows.h>
+#include <hagame/core/hg.h>
+#include <hagame/core/assets.h>
+
+#include "tilemapEditor/tilemapEditor.h"
 
 #if USE_IMGUI
 #include "imgui.h"
@@ -14,9 +18,13 @@
 
 using namespace hg::graphics;
 
+hg::Vec2 toVec(ImVec2 vec) {
+    return hg::Vec2(vec.x, vec.y);
+}
+
 void Game::onInit() {
 #if !HEADLESS
-    m_window = Windows::Create("The Monster's Hand", m_size);
+    m_window = Windows::Create(name(), m_size);
 
     Windows::Events.subscribe(WindowEvents::Close, [&](Window* window) {
         running(false);
@@ -37,11 +45,23 @@ void Game::onInit() {
     ImGui_ImplGlfw_InitForOpenGL(m_window->window(), true);
     ImGui_ImplOpenGL3_Init("#version 300 es");
 #endif
+
+    std::vector<std::string> shaders = {
+        "color",
+        "sprite",
+        "text",
+    };
+
+    for (const auto& shader : shaders) {
+        hg::loadShader(shader, "shaders/" + shader + ".vert", "shaders/" + shader + ".frag");
+    }
+
 }
 
 void Game::onBeforeUpdate() {
 #if !HEADLESS
     m_window->clear();
+    glfwSwapInterval(0);
 #endif
 
 #if USE_IMGUI
@@ -67,8 +87,55 @@ void Game::onDestroy() {
 }
 
 void Game::onUpdate(double dt) {
-    // FILL ME IN!
-    ImGui::Begin("Demo Window");
-    ImGui::Text(("DT: " + std::to_string(dt)).c_str());
+#if USE_IMGUI
+
+    ImGui::Begin("HaGame Tools");
+
+    if (ImGui::Button("Tilemap Editor")) {
+        auto tool = std::make_shared<TilemapEditor>();
+        m_tools.push_back(tool);
+        tool->initialize();
+    }
+
     ImGui::End();
+
+    for (auto& tool : m_tools) {
+        bool showWindow = true;
+
+        tool->render(dt);
+
+        ImGui::Begin(tool->name().c_str(), &showWindow, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+        tool->renderMenu(dt);
+
+        ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
+
+        auto windowPos = toVec(ImGui::GetWindowPos()) + toVec(ImGui::GetWindowContentRegionMin());
+
+        auto windowSize = ImGui::GetWindowSize();
+        float aspectRatio = (float) FULL_HD[0] / FULL_HD[1];
+        auto displaySize = ImVec2(windowSize.x, windowSize.x / aspectRatio);
+
+        if (displaySize.y > windowSize.y) {
+            displaySize = ImVec2(windowSize.y * aspectRatio, windowSize.y);
+        }
+
+        if (ImGui::IsWindowFocused()) {
+            tool->keyboardMouse = m_window->input.keyboardMouse;
+            tool->keyboardMouse.mouse.position -= windowPos;
+            tool->keyboardMouse.mouse.position[1] = displaySize.y - tool->keyboardMouse.mouse.position[1];
+            tool->keyboardMouse.mouse.position = tool->keyboardMouse.mouse.position.div(toVec(displaySize)).prod(hg::Vec2(FULL_HD[0], FULL_HD[1]));
+            tool->tick();
+        }
+
+        ImGui::Image((void*) tool->getDisplay()->id, displaySize, ImVec2(0, 1), ImVec2(1, 0));
+
+        ImGui::End();
+
+        if (!showWindow) {
+            tool->destroy();
+            m_tools.erase(std::remove(m_tools.begin(), m_tools.end(), tool), m_tools.end());
+        }
+    }
+#endif
 }
