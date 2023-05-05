@@ -58,7 +58,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 MESSAGE("${CMAKE_CURRENT_LIST_DIR}")
 find_package(HaGame2 REQUIRED)
 
-add_executable(HGTools main.cpp src/constants.h src/game.h src/game.cpp src/tilemapEditor/tilemapEditor.h src/tilemapEditor/tilemapEditor.cpp src/tool.h src/tool.cpp src/tilemapEditor/tile.h)
+add_executable(HGTools main.cpp src/constants.h src/game.h src/game.cpp src/tilemapEditor/tilemapEditor.h src/tilemapEditor/tilemapEditor.cpp src/tool.h src/tool.cpp src/particleEditor/particleEditor.h src/particleEditor/particleEditor.cpp src/particleEditor/particle.h src/particleEditor/particleEmitter.h src/particleEditor/particleEmitter.cpp)
 target_include_directories(HGTools PUBLIC ${IMGUI_FILEBROWSER})
 target_include_directories(HGTools PUBLIC ${HAGAME2_INCLUDE_DIR})
 target_include_directories(HGTools PUBLIC ${FIND_HAGAME2_PATHS}/thirdparty/asio/asio/include/)

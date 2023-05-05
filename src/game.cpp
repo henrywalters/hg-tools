@@ -8,6 +8,7 @@
 #include <hagame/core/assets.h>
 
 #include "tilemapEditor/tilemapEditor.h"
+#include "particleEditor/particleEditor.h"
 
 #if USE_IMGUI
 #include "imgui.h"
@@ -50,6 +51,7 @@ void Game::onInit() {
         "color",
         "sprite",
         "text",
+        "particle"
     };
 
     for (const auto& shader : shaders) {
@@ -93,6 +95,12 @@ void Game::onUpdate(double dt) {
 
     if (ImGui::Button("Tilemap Editor")) {
         auto tool = std::make_shared<TilemapEditor>();
+        m_tools.push_back(tool);
+        tool->initialize();
+    }
+
+    if (ImGui::Button("Particle Editor")) {
+        auto tool = std::make_shared<ParticleEditor>();
         m_tools.push_back(tool);
         tool->initialize();
     }

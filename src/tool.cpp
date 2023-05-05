@@ -69,3 +69,57 @@ void Tool::saveFile(std::function<void(std::filesystem::path)> onChoose, std::ve
 
     m_files->Open();
 }
+
+void Tool::save() {
+    if (m_saveFile == "") {
+        throw std::runtime_error("No save file chosen, run saveAs first");
+    }
+    saveToDisc(m_saveFile);
+}
+
+void Tool::saveAs() {
+    saveFile([&](auto file) {
+        auto parts = hg::utils::f_getParts(file);
+        m_saveFile = parts.path + (parts.extension == "" ? parts.name + m_fileExtension : parts.fullName);
+        saveToDisc(m_saveFile);
+    }, {m_fileExtension});
+}
+
+void Tool::load() {
+    loadFile([&](auto file) {
+        reset();
+        m_saveFile = file;
+        loadFromDisc(file);
+    }, {m_fileExtension});
+}
+
+void Tool::renderMenu(double dt) {
+    ImGui::BeginMenuBar();
+    if (ImGui::BeginMenu("File"))
+    {
+        if (ImGui::MenuItem("New")) {
+            reset();
+        }
+
+        if (ImGui::MenuItem("Save As")) {
+            saveAs();
+        }
+
+        if (m_saveFile != "" && ImGui::MenuItem("Save")) {
+            save();
+        }
+
+        if (ImGui::MenuItem("Load")) {
+            load();
+        }
+
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Edit"))
+    {
+        // Add items to the "Edit" menu here
+        ImGui::EndMenu();
+    }
+    ImGui::EndMenuBar();
+}
