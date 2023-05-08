@@ -8,9 +8,9 @@
 #include <hagame/graphics/tilemap.h>
 #include <hagame/utils/spatialMap.h>
 #include <hagame/core/assets.h>
+#include <hagame/graphics/particleEmitter.h>
 
 #include "../tool.h"
-#include "particleEmitter.h"
 
 const std::string PARTICLE_EXT = ".hgp";
 const std::string PARTICLE_PROJECT_EXT = ".hgp";
@@ -52,7 +52,7 @@ private:
     std::unique_ptr<hg::graphics::primitives::Quad> m_quad;
     std::unique_ptr<hg::graphics::MeshInstance> m_mesh;
 
-    std::unique_ptr<ParticleEmitter> m_particles;
+    std::unique_ptr<hg::graphics::ParticleEmitter> m_particles;
 };
 
 #endif //HGTOOLS_PARTICLEEDITOR_H

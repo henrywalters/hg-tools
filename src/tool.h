@@ -21,7 +21,9 @@ public:
     Tool(std::string name, std::string fileExtension):
         hg::Game(name),
         m_fileExtension(fileExtension)
-    {}
+    {
+        loadConfig();
+    }
 
     void render(double dt);
     void renderMenu(double dt);
@@ -31,6 +33,11 @@ public:
     hg::input::devices::KeyboardMouse keyboardMouse;
 
 protected:
+
+    hg::utils::Config config;
+
+    void saveConfig();
+    void loadConfig();
 
     virtual void reset() {};
     virtual void saveToDisc(std::string saveFile) {};
